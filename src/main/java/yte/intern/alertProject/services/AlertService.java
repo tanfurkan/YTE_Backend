@@ -27,12 +27,7 @@ public class AlertService {
             return null;
         }
         else{
-            Alert savedAlert = alertRepository.save(alert);
-            ScheduledAlertRunnable alertRun = new ScheduledAlertRunnable(savedAlert.getUrl(),savedAlert.getHttpMethod(),savedAlert.getId(),responseService);
-            System.out.println(alert.getId());
-            alertScheduler.scheduleWithFixedDelay(alertRun,alert.getControlPeriod()*1000);
-
-            return savedAlert;
+            return alertRepository.save(alert);
         }
     }
 
@@ -74,5 +69,11 @@ public class AlertService {
         else{
             return false;
         }
+    }
+
+    public void runAlert(Alert alert){
+        ScheduledAlertRunnable alertRun = new ScheduledAlertRunnable(alert.getUrl(),alert.getHttpMethod(),alert.getId(),responseService);
+        System.out.println(alert.getId());
+        alertScheduler.scheduleWithFixedDelay(alertRun,alert.getControlPeriod()*1000);
     }
 }

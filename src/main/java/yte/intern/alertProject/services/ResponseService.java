@@ -1,5 +1,6 @@
 package yte.intern.alertProject.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import yte.intern.alertProject.model.Alert;
 import yte.intern.alertProject.model.Response;
@@ -10,25 +11,20 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class ResponseService {
 
     private final ResponseRepository responseRepository;
     private final AlertRepository alertRepository;
 
-    public ResponseService(final ResponseRepository responseRepository, AlertRepository alertRepository) {
-        this.responseRepository = responseRepository;
-        this.alertRepository = alertRepository;
-    }
-
-    public Response addResponse(Long alertID, Response response) {
+    public void addResponse(Long alertID, Response response) {
         responseRepository.save(response);
         Optional<Alert> alertInDB = alertRepository.findById(alertID);
         if(alertInDB.isPresent()){
-            Alert alert1 = alertInDB.get();
-            alert1.getResponses().add(response);
-            alertRepository.save(alert1);
+            Alert alert = alertInDB.get();
+            alert.getResponses().add(response);
+            alertRepository.save(alert);
         }
-        return null;
     }
 
     public Set<Response> getAllResponses(Long alertID) {

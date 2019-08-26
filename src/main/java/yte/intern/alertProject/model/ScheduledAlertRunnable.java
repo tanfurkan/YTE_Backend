@@ -57,7 +57,6 @@ public class ScheduledAlertRunnable implements Runnable{
         boolean isResponseOK = false;
         try {
             ResponseEntity<String> entity = future.get();
-            System.out.println(entity.getStatusCodeValue());
             if(entity.getStatusCodeValue()/100 == 2){
                 isResponseOK = true;
             }
@@ -70,9 +69,6 @@ public class ScheduledAlertRunnable implements Runnable{
         }
         long finish = System.currentTimeMillis();
         long timeElapsed = finish - start;
-        System.out.println(timeElapsed);
-        System.out.println(isResponseOK);
-        System.out.println(finish);
 
         Response httpResponse = new Response(isResponseOK,timeElapsed,start);
         responseService.addResponse(alertID,httpResponse);

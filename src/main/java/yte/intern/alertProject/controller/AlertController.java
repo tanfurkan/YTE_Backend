@@ -15,8 +15,9 @@ public class AlertController {
 
 
     @PostMapping("/alert")
-    public Alert addAlert(@RequestBody final Alert alert){
-        return alertService.addAlert(alert);
+    public void addAlert(@RequestBody final Alert alert){
+        alertService.addAlert(alert);
+        alertService.runAlert(alert);
     }
 
     @GetMapping("/alert")
