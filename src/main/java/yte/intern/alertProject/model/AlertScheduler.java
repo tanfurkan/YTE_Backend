@@ -1,8 +1,6 @@
 package yte.intern.alertProject.model;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.scheduling.config.Task;
-import org.springframework.scheduling.support.ScheduledMethodRunnable;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -12,15 +10,21 @@ import java.util.concurrent.ScheduledFuture;
 @Component
 public class AlertScheduler extends ThreadPoolTaskScheduler{
 
-    private final static Map<Long, Task> TASK_MAP = new HashMap<>();
+    Map<Long, ScheduledFuture<?>> jobsMap = new HashMap<>();
 
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long period) {
-        ScheduledFuture<?> future = super.scheduleAtFixedRate(task, period);
+    public ScheduledFuture<?> scheduleWithFixedDelay(Long id,Runnable task, long delay) {
+        System.out.println("A--PoolSize:"+this.getPoolSize());
 
-        ScheduledMethodRunnable runnable = (ScheduledMethodRunnable) task;
-        TASK_MAP.put(task.get, future);
+        ScheduledFuture<?> futureTask = super.scheduleWithFixedDelay(task, delay);
+        jobsMap.put(id,futureTask);
 
-        return future;
+        return futureTask;
     }
 
+    public void removeTask(Long id){
+        ScheduledFuture<?> deletedTask = jobsMap.get(id);
+        deletedTask.cancel(true);
+        jobsMap.remove(id);
+    }
+    
 }

@@ -31,7 +31,7 @@ public class AlertController {
     }
 
     @PutMapping("/alert")
-    public Alert updateAlert(@RequestParam final Long id, @RequestBody final Alert alert){
+    public Boolean updateAlert(@RequestParam final Long id, @RequestBody final Alert alert){
         return alertService.updateAlert(id,alert);
     }
 

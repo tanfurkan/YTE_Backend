@@ -7,7 +7,6 @@ import yte.intern.alertProject.model.Alert;
 import yte.intern.alertProject.model.AlertScheduler;
 import yte.intern.alertProject.model.ScheduledAlertRunnable;
 import yte.intern.alertProject.repository.AlertRepository;
-import yte.intern.alertProject.repository.ResponseRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +16,6 @@ import java.util.Optional;
 public class AlertService {
 
     private final AlertRepository alertRepository;
-    private final ResponseRepository responseRepository;
     private final ResponseService responseService;
     private final AlertScheduler alertScheduler;
 
@@ -27,6 +25,7 @@ public class AlertService {
             return null;
         }
         else{
+            alert.setCreatedAt(System.currentTimeMillis());
             return alertRepository.save(alert);
         }
     }
@@ -45,24 +44,28 @@ public class AlertService {
         return alertRepository.findAll();
     }
 
-    public Alert updateAlert(Long alertID, Alert alert) {
+    public boolean updateAlert(Long alertID, Alert alert) {
         Optional<Alert> alertInDB = alertRepository.findById(alertID);
         if(alertInDB.isPresent()){
+            alertScheduler.removeTask(alertID); // STOP THE RUNNING TASK
             Alert updatedAlert = alertInDB.get();
             updatedAlert.setName(alert.getName());
             updatedAlert.setUrl(alert.getUrl());
             updatedAlert.setHttpMethod(alert.getHttpMethod());
             updatedAlert.setControlPeriod(alert.getControlPeriod());
-            return alertRepository.save(updatedAlert);
+            alertRepository.save(updatedAlert);
+            runAlert(updatedAlert); // RUN THE TASK AGAIN
+            return true;
         }
         else{
-            return null;
+            return false;
         }
     }
 
     public boolean deleteAlert(Long alertID) {
         Optional<Alert> alertInDB = alertRepository.findById(alertID);
         if(alertInDB.isPresent()){
+            alertScheduler.removeTask(alertID);
             alertRepository.delete(alertInDB.get());
             return true;
         }
@@ -72,8 +75,17 @@ public class AlertService {
     }
 
     public void runAlert(Alert alert){
+
+        if(alertScheduler.getPoolSize() < 2){
+                System.out.println("PoolSize:"+alertScheduler.getPoolSize());
+                System.out.println("POOL SIZE <2 ");
+                alertScheduler.setPoolSize(50);
+                System.out.println("PoolSize:"+alertScheduler.getPoolSize());
+
+        }
+
         ScheduledAlertRunnable alertRun = new ScheduledAlertRunnable(alert.getUrl(),alert.getHttpMethod(),alert.getId(),responseService);
         System.out.println(alert.getId());
-        alertScheduler.scheduleWithFixedDelay(alertRun,alert.getControlPeriod()*1000);
+        alertScheduler.scheduleWithFixedDelay(alert.getId(),alertRun,alert.getControlPeriod()*1000);
     }
 }

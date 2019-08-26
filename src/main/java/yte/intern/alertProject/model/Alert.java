@@ -15,15 +15,15 @@ public class Alert {
     @GeneratedValue
     private Long id;
 
-    @Column(unique=true)
     private String name;
     private String url;
     private String httpMethod;
     private Long controlPeriod;
+    private Long createdAt;
 
     @OneToMany(
             fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL,
+            cascade = CascadeType.REMOVE,
             orphanRemoval = true
     )
     @JoinColumn(name="alertID")
