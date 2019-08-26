@@ -6,7 +6,6 @@ import yte.intern.alertProject.model.Response;
 import yte.intern.alertProject.repository.AlertRepository;
 import yte.intern.alertProject.repository.ResponseRepository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,16 +20,6 @@ public class ResponseService {
         this.alertRepository = alertRepository;
     }
 
-    public Response getResponse(Long id) {
-        Optional<Response> responseInDB = responseRepository.findById(id);
-        if(responseInDB.isPresent()){
-            return responseInDB.get();
-        }
-        else{
-            return null;
-        }
-    }
-
     public Response addResponse(Long alertID, Response response) {
         responseRepository.save(response);
         Optional<Alert> alertInDB = alertRepository.findById(alertID);
@@ -40,10 +29,6 @@ public class ResponseService {
             alertRepository.save(alert1);
         }
         return null;
-    }
-
-    public List<Response> getAllResponses() {
-        return responseRepository.findAll();
     }
 
     public Set<Response> getAllResponses(Long alertID) {

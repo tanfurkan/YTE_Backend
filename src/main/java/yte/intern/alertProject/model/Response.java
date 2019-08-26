@@ -1,22 +1,28 @@
 package yte.intern.alertProject.model;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @Entity
+@RequiredArgsConstructor
 public class Response {
 
     @Id
     @GeneratedValue
     private Long id;
 
-    private Long responseCode;
+    private boolean isSuccessful;
     private Long responseTime;
-    private LocalDateTime timeStamp;
+    private Long timeStamp;
 
+    public Response(boolean isSuccessful, Long responseTime, Long timeStamp) {
+        this.isSuccessful = isSuccessful;
+        this.responseTime = responseTime;
+        this.timeStamp = timeStamp;
+    }
 }

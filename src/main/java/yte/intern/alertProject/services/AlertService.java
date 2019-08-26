@@ -1,20 +1,25 @@
 package yte.intern.alertProject.services;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import yte.intern.alertProject.model.Alert;
+import yte.intern.alertProject.model.AlertScheduler;
+import yte.intern.alertProject.model.ScheduledAlertRunnable;
 import yte.intern.alertProject.repository.AlertRepository;
+import yte.intern.alertProject.repository.ResponseRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class AlertService {
 
     private final AlertRepository alertRepository;
-
-    public AlertService(final AlertRepository alertRepository) {
-        this.alertRepository = alertRepository;
-    }
+    private final ResponseRepository responseRepository;
+    private final ResponseService responseService;
+    private final AlertScheduler alertScheduler;
 
     public Alert addAlert(final Alert alert){
         Optional<Alert> alertInDB = alertRepository.findByName(alert.getName());
@@ -22,7 +27,12 @@ public class AlertService {
             return null;
         }
         else{
-            return alertRepository.save(alert);
+            Alert savedAlert = alertRepository.save(alert);
+            ScheduledAlertRunnable alertRun = new ScheduledAlertRunnable(savedAlert.getUrl(),savedAlert.getHttpMethod(),savedAlert.getId(),responseService);
+            System.out.println(alert.getId());
+            alertScheduler.scheduleWithFixedDelay(alertRun,alert.getControlPeriod()*1000);
+
+            return savedAlert;
         }
     }
 

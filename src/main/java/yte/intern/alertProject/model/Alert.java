@@ -22,6 +22,7 @@ public class Alert {
     private Long controlPeriod;
 
     @OneToMany(
+            fetch = FetchType.EAGER,
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
