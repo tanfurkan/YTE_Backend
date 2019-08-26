@@ -1,0 +1,68 @@
+package yte.intern.alertProject.services;
+
+import org.springframework.stereotype.Service;
+import yte.intern.alertProject.model.Alert;
+import yte.intern.alertProject.repository.AlertRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class AlertService {
+
+    private final AlertRepository alertRepository;
+
+    public AlertService(final AlertRepository alertRepository) {
+        this.alertRepository = alertRepository;
+    }
+
+    public Alert addAlert(final Alert alert){
+        Optional<Alert> alertInDB = alertRepository.findByName(alert.getName());
+        if(alertInDB.isPresent()){
+            return null;
+        }
+        else{
+            return alertRepository.save(alert);
+        }
+    }
+
+    public Alert getAlert(final Long alertID) {
+        Optional<Alert> alertInDB = alertRepository.findById(alertID);
+        if(alertInDB.isPresent()){
+            return alertInDB.get();
+        }
+        else{
+            return null;
+        }
+    }
+
+    public List<Alert> getAllAlerts() {
+        return alertRepository.findAll();
+    }
+
+    public Alert updateAlert(Long alertID, Alert alert) {
+        Optional<Alert> alertInDB = alertRepository.findById(alertID);
+        if(alertInDB.isPresent()){
+            Alert updatedAlert = alertInDB.get();
+            updatedAlert.setName(alert.getName());
+            updatedAlert.setUrl(alert.getUrl());
+            updatedAlert.setHttpMethod(alert.getHttpMethod());
+            updatedAlert.setControlPeriod(alert.getControlPeriod());
+            return alertRepository.save(updatedAlert);
+        }
+        else{
+            return null;
+        }
+    }
+
+    public boolean deleteAlert(Long alertID) {
+        Optional<Alert> alertInDB = alertRepository.findById(alertID);
+        if(alertInDB.isPresent()){
+            alertRepository.delete(alertInDB.get());
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+}

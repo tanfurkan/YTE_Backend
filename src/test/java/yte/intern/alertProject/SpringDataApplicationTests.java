@@ -1,4 +1,4 @@
-package yte.intern.spring_data;
+package yte.intern.alertProject;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
