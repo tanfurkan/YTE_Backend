@@ -26,5 +26,5 @@ public class AlertScheduler extends ThreadPoolTaskScheduler{
         deletedTask.cancel(true);
         jobsMap.remove(id);
     }
-    
+
 }

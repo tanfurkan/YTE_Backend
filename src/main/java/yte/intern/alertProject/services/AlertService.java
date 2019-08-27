@@ -41,7 +41,7 @@ public class AlertService {
     }
 
     public List<Alert> getAllAlerts() {
-        return alertRepository.findAll();
+        return alertRepository.findAllByOrOrderByCreatedAt();
     }
 
     public boolean updateAlert(Long alertID, Alert alert) {

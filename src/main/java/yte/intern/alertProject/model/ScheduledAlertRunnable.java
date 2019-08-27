@@ -71,7 +71,7 @@ public class ScheduledAlertRunnable implements Runnable{
         }
         long finish = System.currentTimeMillis();
         long timeElapsed = finish - start;
-        System.out.println(Thread:"+  Thread.currentThread().getName() +"Url: "+ url + " Method:" +method+ " AlertID:"+ alertID + " Response:"+ isResponseOK + " Time:"+timeElapsed);
+        System.out.println("Thread:"+  Thread.currentThread().getName() +"Url: "+ url + " Method:" +method+ " AlertID:"+ alertID + " Response:"+ isResponseOK + " Time:"+timeElapsed);
 
         Response httpResponse = new Response(isResponseOK,timeElapsed,start);
         responseService.addResponse(alertID,httpResponse);
