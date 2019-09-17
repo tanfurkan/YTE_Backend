@@ -5,3 +5,5 @@ spring:
         username:
         password:
         url: jdbc:postgresql://localhost:PORT/DB_NAME
+server:
+  port: DEFAULT_PORT

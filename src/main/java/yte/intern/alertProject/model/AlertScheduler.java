@@ -12,18 +12,16 @@ public class AlertScheduler extends ThreadPoolTaskScheduler{
 
     Map<Long, ScheduledFuture<?>> jobsMap = new HashMap<>();
 
-    public ScheduledFuture<?> scheduleWithFixedDelay(Long id,Runnable task, long delay) {
-        System.out.println("A--PoolSize:"+this.getPoolSize());
+    public void scheduleWithFixedDelay(Long id,Runnable task, long delay) {
 
         ScheduledFuture<?> futureTask = super.scheduleWithFixedDelay(task, delay);
         jobsMap.put(id,futureTask);
 
-        return futureTask;
     }
 
     public void removeTask(Long id){
         ScheduledFuture<?> deletedTask = jobsMap.get(id);
-        deletedTask.cancel(true);
+        deletedTask.cancel(false);
         jobsMap.remove(id);
     }
 

@@ -1,6 +1,5 @@
 package yte.intern.alertProject.services;
 
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import yte.intern.alertProject.model.Alert;
@@ -12,15 +11,22 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
 public class AlertService {
 
     private final AlertRepository alertRepository;
     private final ResponseService responseService;
     private final AlertScheduler alertScheduler;
 
+    public AlertService(AlertRepository alertRepository, ResponseService responseService, AlertScheduler alertScheduler) {
+        this.alertRepository = alertRepository;
+        this.responseService = responseService;
+        this.alertScheduler = alertScheduler;
+        this.runAllAlertInDB();
+    }
+
     public Alert addAlert(final Alert alert){
         Optional<Alert> alertInDB = alertRepository.findByName(alert.getName());
+
         if(alertInDB.isPresent()){
             return null;
         }
@@ -32,6 +38,7 @@ public class AlertService {
 
     public Alert getAlert(final Long alertID) {
         Optional<Alert> alertInDB = alertRepository.findById(alertID);
+
         if(alertInDB.isPresent()){
             return alertInDB.get();
         }
@@ -41,11 +48,12 @@ public class AlertService {
     }
 
     public List<Alert> getAllAlerts() {
-        return alertRepository.findAllByOrOrderByCreatedAt();
+        return alertRepository.findAll();
     }
 
     public boolean updateAlert(Long alertID, Alert alert) {
         Optional<Alert> alertInDB = alertRepository.findById(alertID);
+
         if(alertInDB.isPresent()){
             alertScheduler.removeTask(alertID); // STOP THE RUNNING TASK
             Alert updatedAlert = alertInDB.get();
@@ -64,6 +72,7 @@ public class AlertService {
 
     public boolean deleteAlert(Long alertID) {
         Optional<Alert> alertInDB = alertRepository.findById(alertID);
+
         if(alertInDB.isPresent()){
             alertScheduler.removeTask(alertID);
             alertRepository.delete(alertInDB.get());
@@ -75,17 +84,16 @@ public class AlertService {
     }
 
     public void runAlert(Alert alert){
-
-        if(alertScheduler.getPoolSize() < 2){
-                System.out.println("PoolSize:"+alertScheduler.getPoolSize());
-                System.out.println("POOL SIZE <2 ");
-                alertScheduler.setPoolSize(50);
-                System.out.println("PoolSize:"+alertScheduler.getPoolSize());
-
-        }
-
         ScheduledAlertRunnable alertRun = new ScheduledAlertRunnable(alert.getUrl(),alert.getHttpMethod(),alert.getId(),responseService);
-        System.out.println(alert.getId());
         alertScheduler.scheduleWithFixedDelay(alert.getId(),alertRun,alert.getControlPeriod()*1000);
+    }
+    
+    public void runAllAlertInDB(){
+        alertScheduler.setPoolSize(50);
+        alertScheduler.setThreadGroupName("");
+        List<Alert> alertList = getAllAlerts();
+        for (Alert alert : alertList) {
+            runAlert(alert);
+        }
     }
 }

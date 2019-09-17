@@ -9,15 +9,22 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin
 public class AlertController {
 
     private final AlertService alertService;
 
 
     @PostMapping("/alert")
-    public void addAlert(@RequestBody final Alert alert){
-        alertService.addAlert(alert);
-        alertService.runAlert(alert);
+    public boolean addAlert(@RequestBody final Alert alert){
+        Alert savedAlert = alertService.addAlert(alert);
+        if(savedAlert != null){
+            alertService.runAlert(alert);
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     @GetMapping("/alert")

@@ -15,6 +15,7 @@ public class Alert {
     @GeneratedValue
     private Long id;
 
+    @Column(unique = true)
     private String name;
     private String url;
     private String httpMethod;

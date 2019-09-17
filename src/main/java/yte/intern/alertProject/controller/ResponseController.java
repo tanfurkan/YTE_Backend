@@ -5,12 +5,12 @@ import org.springframework.web.bind.annotation.*;
 import yte.intern.alertProject.model.Response;
 import yte.intern.alertProject.services.ResponseService;
 
-import java.util.List;
 import java.util.Set;
 
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin
 public class ResponseController {
 
     private final ResponseService responseService;

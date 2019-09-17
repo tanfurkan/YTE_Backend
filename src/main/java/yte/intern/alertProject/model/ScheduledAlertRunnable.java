@@ -32,6 +32,9 @@ public class ScheduledAlertRunnable implements Runnable{
     private final ResponseService responseService;
 
     public void run() {
+        long start = System.currentTimeMillis();
+        boolean isResponseOK = false;
+        try {
         AsyncRestTemplate asycTemp = new AsyncRestTemplate();
         String url = this.url;
         String method = this.method;
@@ -55,9 +58,8 @@ public class ScheduledAlertRunnable implements Runnable{
         headers.setContentType(MediaType.TEXT_PLAIN);
         HttpEntity<String> requestEntity = new HttpEntity<String>("params", headers);
         ListenableFuture<ResponseEntity<String>> future = asycTemp.exchange(url, httpMethod, requestEntity, responseType);
-        long start = System.currentTimeMillis();
-        boolean isResponseOK = false;
-        try {
+        start = System.currentTimeMillis();
+
             ResponseEntity<String> entity = future.get();
             if(entity.getStatusCodeValue()/100 == 2){
                 isResponseOK = true;
@@ -71,7 +73,7 @@ public class ScheduledAlertRunnable implements Runnable{
         }
         long finish = System.currentTimeMillis();
         long timeElapsed = finish - start;
-        System.out.println("Thread:"+  Thread.currentThread().getName() +"Url: "+ url + " Method:" +method+ " AlertID:"+ alertID + " Response:"+ isResponseOK + " Time:"+timeElapsed);
+        System.out.println( new Date() + " Thread:"+  Thread.currentThread().getName() +" Url: "+ url + " Method:" +method+ " AlertID:"+ alertID + " Response:"+ isResponseOK + " Time:"+timeElapsed);
 
         Response httpResponse = new Response(isResponseOK,timeElapsed,start);
         responseService.addResponse(alertID,httpResponse);
